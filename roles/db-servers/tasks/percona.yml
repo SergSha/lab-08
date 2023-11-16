@@ -245,45 +245,66 @@
     state: restarted
     enabled: yes
 
-- name: Create application database
-  community.mysql.mysql_db: 
-    name: "{{ db_name }}"
-    state: "present"
-    collation: "{{ db_collation }}"
+#- name: Create application database
+#  community.mysql.mysql_db: 
+#    name: "{{ db_name }}"
+#    state: "present"
+#    collation: "{{ db_collation }}"
+#    login_user: "{{ mysql_root_user }}"
+#    login_password: "{{ mysql_root_password }}"
+
+#- name: Copy SQL dump file to the server
+#  ansible.builtin.copy:
+#    src: "percona/{{ db_dump_file }}"
+#    dest: /tmp
+#  when: db_dump_file != ""
+
+#- name: Dump file into the database
+#  community.mysql.mysql_db: 
+#    name: "{{ db_name }}"
+#    state: import
+#    target: "/tmp/{{ db_dump_file | basename }}"
+#    login_user: "{{ mysql_root_user }}"
+#    login_password: "{{ mysql_root_password }}"
+#  when: db_dump_file != ""
+
+#- name: Create Application user database
+#  community.mysql.mysql_user: 
+#    name: "{{  db_user }}"
+#    password: "{{ db_user_password }}"
+#    priv: "{{ db_name }}.*:ALL"
+#    host: "{{ db_host }}"
+#    state: present
+#    login_user: "{{ mysql_root_user }}"
+#    login_password: "{{ mysql_root_password }}"
+
+#- name: Create Application user database
+#  community.mysql.mysql_user:
+#    name: "{{  mysql_php_user }}"
+#    password: "{{ mysql_php_password }}"
+#    priv: "{{ db_name }}.*:ALL"
+#    host: "{{ db_host }}"
+#    state: present
+#    login_user: "{{ mysql_root_user }}"
+#    login_password: "{{ mysql_root_password }}"
+
+
+
+
+- name: DB | Create Database for Wordpress
+  community.mysql.mysql_db:
+    name: "{{ wp_db_name }}"
     login_user: "{{ mysql_root_user }}"
     login_password: "{{ mysql_root_password }}"
+    #login_unix_socket: /run/mysqld/mysqld.sock
 
-- name: Copy SQL dump file to the server
-  ansible.builtin.copy:
-    src: "percona/{{ db_dump_file }}"
-    dest: /tmp
-  when: db_dump_file != ""
-
-- name: Dump file into the database
-  community.mysql.mysql_db: 
-    name: "{{ db_name }}"
-    state: import
-    target: "/tmp/{{ db_dump_file | basename }}"
-    login_user: "{{ mysql_root_user }}"
-    login_password: "{{ mysql_root_password }}"
-  when: db_dump_file != ""
-
-- name: Create Application user database
-  community.mysql.mysql_user: 
-    name: "{{  db_user }}"
-    password: "{{ db_user_password }}"
-    priv: "{{ db_name }}.*:ALL"
-    host: "{{ db_host }}"
-    state: present
-    login_user: "{{ mysql_root_user }}"
-    login_password: "{{ mysql_root_password }}"
-
-- name: Create Application user database
+- name: DB | Create database user using hashed password with all database privileges
   community.mysql.mysql_user:
-    name: "{{  mysql_php_user }}"
-    password: "{{ mysql_php_password }}"
-    priv: "{{ db_name }}.*:ALL"
-    host: "{{ db_host }}"
+    name: "{{ wp_db_user }}"
+    host: "10.10.0.0/255.255.0.0"
+    password: "{{ wp_db_pass }}"
+    priv: "{{ wp_db_name }}.*:ALL"
     state: present
     login_user: "{{ mysql_root_user }}"
     login_password: "{{ mysql_root_password }}"
+    #login_unix_socket: /run/mysqld/mysqld.sock

@@ -31,7 +31,6 @@
   serial: 5
   roles:
     - { role: chrony, tags: chrony_tag }
-    - { role: filebeats, tags: filebeats_tag }
 
 - hosts: jump_servers
   #remote_user: cloud-user
@@ -60,6 +59,7 @@
   serial: 5
   roles:
     - { role: backend-servers, tags: backend-servers_tag }
+    - { role: wordpress, tags: wordpress_tag }
 
 #- hosts: haproxy_servers
 #  #remote_user: cloud-user
@@ -80,10 +80,10 @@
   gather_facts: true
   become: true
   roles:
-    - { role: opensearch, tags: os-servers_tag }
+    - { role: opensearch, tags: opensearch_tag }
 
 - name: Kafka installation & configuration
-  hosts: kafka-servers
+  hosts: kafka_servers
   gather_facts: true
   become: true
   roles:

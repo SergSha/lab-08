@@ -3,9 +3,9 @@
 #  include_tasks: nftables.yml
 
 - name: Install Zookeeper
-  include_tasks: zookeeper.yaml
-  when: inventory_hostname in groups.kafka
+  include_tasks: zookeeper.yml
+  #when: inventory_hostname in groups['kafka_servers']
 
 - name: Install Kafka
-  include_tasks: kafka.yaml
-  when: inventory_hostname in groups.kafka
+  include_tasks: kafka.yml
+  #when: inventory_hostname in groups['kafka_servers']

@@ -18,6 +18,9 @@ ${ nginx-server["name"] } ansible_host=${ nginx-server.network_interface[0].ip_a
 %{ for os-server in os-servers ~}
 ${ os-server["name"] } ansible_host=${ os-server.network_interface[0].ip_address } ip=${ os-server.network_interface[0].ip_address }
 %{ endfor ~}
+%{ for kafka-server in kafka-servers ~}
+${ kafka-server["name"] } ansible_host=${ kafka-server.network_interface[0].ip_address } ip=${ kafka-server.network_interface[0].ip_address }
+%{ endfor ~}
 
 [jump_servers]
 %{ for jump-server in jump-servers ~}
