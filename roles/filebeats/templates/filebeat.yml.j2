@@ -7,12 +7,18 @@ filebeat.inputs:
     - /var/log/nginx/*.log
 {% elif inventory_hostname in groups['backend_servers'] %}
     - /var/log/nginx/*.log
-{% elif inventory_hostname in groups['db_servers'] %}
-    - /var/log/mysqld.log
 {% endif %}
 
-output.logstash:
+output.kafka:
   hosts:
-{% for item in groups['os-cluster'] %}
-    - {{ hostvars[item]['ip'] }}:5044
+{% for item in groups['kafka_servers'] %}
+    - {{ hostvars[item]['ip'] }}:9092
 {% endfor %}
+  topic:
+{%- if inventory_hostname in groups['nginx_servers'] %}
+ "nginx"
+{% elif inventory_hostname in groups['backend_servers'] %}
+ "wordpress"
+{% endif %}
+  required_acks: 1
+  compression: gzip

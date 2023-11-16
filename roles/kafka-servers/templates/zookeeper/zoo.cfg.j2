@@ -1,0 +1,13 @@
+tickTime=2000
+dataDir={{ zk_data_dir }}
+clientPort=2181 
+dynamicConfigFile={{ zk_root_dir }}/conf/zoo.cfg.dynamic
+dataLogDir = /var/log/zookeeper
+maxSessionTimeout = 50000
+syncLimit = 5
+initLimit = 300
+autopurge.purgeInterval = 1
+autopurge.snapRetainCount = 5
+snapCount = 200000
+maxClientCnxns = 100
+4lw.commands.whitelist=stat

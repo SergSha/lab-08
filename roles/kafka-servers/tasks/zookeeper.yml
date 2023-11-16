@@ -1,0 +1,81 @@
+- name: Zookeeper | Install Java
+  ansible.builtin.dnf:
+    name: "default-jre-headless"
+    state: latest
+    update_cache: true
+
+- name: Zookeeper | Add Zookeeper user
+  ansible.builtin.user:
+    name: zookeeper
+    shell: "/bin/false"
+    system: false
+    create_home: false
+
+- name: Zookeeper | Make directory for zookeeper
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: zookeeper
+    group: zookeeper
+  loop:
+  - "{{ zk_root_dir }}"
+  - "{{ zk_data_dir }}"
+  - /var/log/zookeeper
+
+- name: Zookeeper | Download zookeeper package
+  ansible.builtin.get_url:
+    url: "https://archive.apache.org/dist/zookeeper/zookeeper-3.6.4/apache-zookeeper-3.6.4-bin.tar.gz"
+    dest: "/tmp/apache-zookeeper-bin.tar.gz"
+  register: download
+
+- name: Zookeeper | Download and unarchive zookeeper
+  ansible.builtin.unarchive:
+    src: "/tmp/apache-zookeeper-bin.tar.gz"
+    dest: "{{ zk_root_dir }}"
+    remote_src: true
+    extra_opts: 
+    - "--strip-components=1"
+    owner: zookeeper
+    group: zookeeper
+  when: download.changed
+
+- name: Zookeeper | Copy systemd unit file
+  ansible.builtin.template:
+    src: zookeeper/zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+  when: download.changed
+
+- name: Zookeeper | Copy main config
+  ansible.builtin.template:
+    src: zookeeper/zoo.cfg.j2
+    dest: "{{ zk_root_dir }}/conf/zoo.cfg"
+    owner: zookeeper
+    group: zookeeper  
+  when: download.changed
+  notify: restart zookeeper
+
+- name: Zookeeper | Configure zookeeper cluster
+  ansible.builtin.template:
+    src: zookeeper/zoo.cfg.dynamic.j2
+    dest: "{{ zk_root_dir }}/conf/zoo.cfg.dynamic"
+    owner: zookeeper
+    group: zookeeper
+  when: download.changed
+  notify: restart zookeeper
+
+- name: Zookeeper | Configure id
+  ansible.builtin.copy:
+    dest: "{{ zk_data_dir }}/myid"
+    content: "{{ my_id }}"
+    owner: zookeeper
+    group: zookeeper
+  when: download.changed
+  notify: restart zookeeper
+
+- name: Zookeeper | Start zookeeper service
+  ansible.builtin.systemd:
+    name: zookeeper
+    state: started
+    enabled: true
+    daemon_reload: true
+  when: download.changed

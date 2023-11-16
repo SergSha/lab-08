@@ -60,7 +60,19 @@ ${ os-server["name"] }
 %{ endfor ~}
 
 [dashboards]
-jump-01
+%{ for jump-server in jump-servers ~}
+${ jump-server["name"] }
+%{ endfor ~}
+
+[kafka_servers]
+%{ for kafka-server in kafka-servers ~}
+${ kafka-server["name"] }
+%{ endfor ~}
+
+[logstash_servers]
+%{ for os-server in os-servers ~}
+${ os-server["name"] }
+%{ endfor ~}
 
 [all:vars]
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyJump="${ remote_user }@${ jump-servers[0].network_interface[0].nat_ip_address }"'

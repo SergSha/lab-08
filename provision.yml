@@ -82,6 +82,26 @@
   roles:
     - { role: opensearch, tags: os-servers_tag }
 
+- name: Kafka installation & configuration
+  hosts: kafka-servers
+  gather_facts: true
+  become: true
+  roles:
+    - { role: kafka-servers, tags: kafka-servers_tag }
+
+- name: Logstash installation & configuration
+  hosts: os-cluster
+  gather_facts: true
+  become: true
+  roles:
+    - { role: logstash-servers, tags: logstash-servers_tag }
+
+- hosts: nginx_servers,backend_servers
+  become: true
+  serial: 5
+  roles:
+    - { role: filebeats, tags: filebeats_tag }
+
 - name: Opensearch dashboards installation & configuration
   hosts: dashboards
   gather_facts: true

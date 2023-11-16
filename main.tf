@@ -37,6 +37,7 @@ locals {
   backend_count  = "2"
   nginx_count    = "2"
   os_count       = "3"
+  kafka_count    = "3"
   /*
   disk = {
     "web" = {
@@ -303,16 +304,49 @@ data "yandex_compute_instance" "os-servers" {
   depends_on = [module.os-servers]
 }
 
+module "kafka-servers" {
+  source         = "./modules/instances"
+  count          = local.kafka_count
+  vm_name        = "kafka-${format("%02d", count.index + 1)}"
+  cpu            = 2
+  memory         = 2
+  vpc_name       = local.vpc_name
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  network_interface = {
+    for subnet in yandex_vpc_subnet.subnets :
+    subnet.name => {
+      subnet_id = subnet.id
+      #nat       = true
+    }
+    if subnet.name == "lab-subnet" #|| subnet.name == "nginx-subnet"
+  }
+  #subnet_cidrs   = yandex_vpc_subnet.subnet.v4_cidr_blocks
+  #subnet_name    = yandex_vpc_subnet.subnet.name
+  #subnet_id      = yandex_vpc_subnet.subnet.id
+  vm_user        = local.vm_user
+  ssh_public_key = local.ssh_public_key
+  secondary_disk = {}
+  depends_on     = [yandex_compute_disk.disks]
+}
+
+data "yandex_compute_instance" "kafka-servers" {
+  count      = length(module.kafka-servers)
+  name       = module.kafka-servers[count.index].vm_name
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  depends_on = [module.kafka-servers]
+}
+
 resource "local_file" "inventory_file" {
   content = templatefile("${path.module}/templates/inventory.tpl",
     {
-      jump-servers     = data.yandex_compute_instance.jump-servers
-      db-servers       = data.yandex_compute_instance.db-servers
-      iscsi-servers    = data.yandex_compute_instance.iscsi-servers
-      backend-servers  = data.yandex_compute_instance.backend-servers
-      nginx-servers    = data.yandex_compute_instance.nginx-servers
-      os-servers       = data.yandex_compute_instance.os-servers
-      remote_user      = local.vm_user
+      jump-servers    = data.yandex_compute_instance.jump-servers
+      db-servers      = data.yandex_compute_instance.db-servers
+      iscsi-servers   = data.yandex_compute_instance.iscsi-servers
+      backend-servers = data.yandex_compute_instance.backend-servers
+      nginx-servers   = data.yandex_compute_instance.nginx-servers
+      os-servers      = data.yandex_compute_instance.os-servers
+      kafka-servers   = data.yandex_compute_instance.kafka-servers
+      remote_user     = local.vm_user
     }
   )
   filename = "${path.module}/inventory.ini"

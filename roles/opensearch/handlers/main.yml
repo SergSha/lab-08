@@ -4,7 +4,16 @@
   become: true
   ansible.builtin.command: systemctl daemon-reload
 
-# Restart service and ensure it is enabled
-
+# systemctl daemon_reload && systemctl restart opensearch
 - name: restart opensearch
-  ansible.builtin.systemd: name=opensearch state=restarted enabled=yes
+  ansible.builtin.systemd: 
+    name: opensearch
+    state: restarted
+    daemon_reload: true
+
+# systemctl daemon_reload && systemctl restart logstash
+- name: restart logstash
+  ansible.builtin.systemd:
+    name: logstash
+    state: restarted
+    daemon_reload: true

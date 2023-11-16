@@ -1,0 +1,27 @@
+[Unit]
+Description=zookeeper:3.6.4
+After=network.target
+
+[Service]
+Type=forking
+User=zookeeper
+Group=zookeeper
+
+WorkingDirectory={{ zk_root_dir }}
+
+ExecStart={{ zk_root_dir }}/bin/zkServer.sh start
+ExecStop={{ zk_root_dir }}/bin/zkServer.sh stop
+ExecReload={{ zk_root_dir }}/bin/zkServer.sh restart
+
+RestartSec=30
+Restart=always
+
+PrivateTmp=yes
+PrivateDevices=yes
+
+LimitCORE=infinity
+LimitNOFILE=500000
+
+[Install]
+WantedBy=multi-user.target
+Alias=zookeeper.service

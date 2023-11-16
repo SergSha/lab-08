@@ -4,11 +4,8 @@ flush ruleset
 
 table ip filter {
 
-        chain LOGSTASH_INP {
-                tcp dport { 9092, 9600 } ct state new counter accept
-        }
-        chain OPENSEARCH_INP {
-                tcp dport { 9200, 9300 } ct state new counter accept
+        chain KAFKA_INP {
+                tcp dport 9092 ct state new counter accept
         }
         chain INPUT {
                 type filter hook input priority filter; policy drop;
@@ -18,8 +15,7 @@ table ip filter {
                 udp dport 323 counter accept
                 ip saddr {{ subnet_cidrs }} icmp type echo-request counter accept
                 ct state established,related counter accept
-                counter jump OPENSEARCH_INP
-                counter jump LOGSTASH_INP
+                counter jump KAFKA_INP
         }
 
         chain FORWARD {

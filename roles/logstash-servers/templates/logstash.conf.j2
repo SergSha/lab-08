@@ -1,19 +1,25 @@
 input {
-  beats {
-    port => 5044
+  kafka {
+    bootstrap_servers => "
+{%- for item in groups['kafka_servers'] %}
+{{ hostvars[item].ansible_host }}:9092{% if not loop.last %},{% endif %}
+{%- endfor %}
+" 
+    topics => ["nginx", "wordpress"]
+    decorate_events => extended
   }
 }
 
 output {
   opensearch {
-    hosts => [
+    hosts    => [
 {%- for item in groups['os-cluster'] %}
 "https://{{ hostvars[item].ansible_host }}:9200"{% if not loop.last %},{% endif %}
 {%- endfor %}
 ]
-    index    => "logstash-logs-%{+YYYY.MM.dd}"
     user     => "admin"
     password => "{{ admin_password }}"
+    index    => "%{[@metadata][kafka][topic]}-%{+YYYY.MM.dd}"
     ssl_certificate_verification => false
   }
   stdout { codec => rubydebug }
