@@ -35,7 +35,7 @@ locals {
   db_count       = "1"
   iscsi_count    = "1"
   backend_count  = "2"
-  nginx_count    = "2"
+  nginx_count    = "0"
   os_count       = "1"
   kafka_count    = "1"
   /*
@@ -373,7 +373,7 @@ resource "yandex_compute_disk" "disks" {
 #  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  depends_on = [yandex_compute_disk.disks]
 #}
-
+/*
 resource "yandex_lb_target_group" "keepalived_group" {
   name      = "keepalived-group"
   region_id = "ru-central1"
@@ -418,7 +418,7 @@ data "yandex_lb_network_load_balancer" "keepalived" {
   #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [yandex_lb_network_load_balancer.keepalived]
 }
-
+*/
 /*
 resource "null_resource" "nginx-servers" {
 

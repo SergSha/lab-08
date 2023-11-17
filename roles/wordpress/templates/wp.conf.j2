@@ -1,9 +1,12 @@
 # Upstream to abstract backend connection(s) for php
 upstream php {
-        server unix:/run/php/php8.1-fpm.sock;
+        server unix:/run/php-fpm/www.sock;
 }
 
 server {
+        listen 8080 default_server;
+        listen [::]:8080 default_server;
+
         ## Your website name goes here.
         server_name _;
         ## Your only path reference.

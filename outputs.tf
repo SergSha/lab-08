@@ -74,9 +74,9 @@ output "kafka-servers-info" {
     }
   }
 }
-
+/*
 output "loadbalancer-info" {
   description = "General information about loadbalancer"
   value = data.yandex_lb_network_load_balancer.keepalived.listener
 }
-
+*/

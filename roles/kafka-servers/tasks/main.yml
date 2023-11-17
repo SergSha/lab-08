@@ -4,8 +4,6 @@
 
 - name: Install Zookeeper
   include_tasks: zookeeper.yml
-  #when: inventory_hostname in groups['kafka_servers']
 
 - name: Install Kafka
   include_tasks: kafka.yml
-  #when: inventory_hostname in groups['kafka_servers']

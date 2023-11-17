@@ -25,7 +25,7 @@
 
 - name: Zookeeper | Download zookeeper package
   ansible.builtin.get_url:
-    url: "https://archive.apache.org/dist/zookeeper/zookeeper-3.6.4/apache-zookeeper-3.6.4-bin.tar.gz"
+    url: "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.1/apache-zookeeper-3.9.1-bin.tar.gz"
     dest: "/tmp/apache-zookeeper-bin.tar.gz"
   register: download
 
@@ -67,7 +67,7 @@
 - name: Zookeeper | Configure id
   ansible.builtin.copy:
     dest: "{{ zk_data_dir }}/myid"
-    content: "{{ my_id }}"
+    content: "{{ myid }}"
     owner: zookeeper
     group: zookeeper
   when: download.changed

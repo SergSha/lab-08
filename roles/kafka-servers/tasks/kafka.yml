@@ -1,6 +1,6 @@
 - name: Kafka | Install Java
   ansible.builtin.dnf:
-    name: default-jre-headless
+    name: "java-17-openjdk" # java-11-openjdk
     state: latest
     update_cache: true
 
@@ -52,11 +52,11 @@
   ansible.builtin.lineinfile:
     path: /opt/kafka/config/server.properties
     search_string: "broker.id="
-    line: "broker.id={{ my_id }}"
+    line: "broker.id={{ myid }}"
   when: download.changed
 
-- name: Kafka | Copy kafka systemd unit file
-  ansible.builtin.copy:
+- name: Kafka | Template kafka systemd unit file
+  ansible.builtin.template:
     src: kafka/kafka.service.j2
     dest: /etc/systemd/system/kafka.service
   when: download.changed
