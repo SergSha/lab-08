@@ -53,7 +53,7 @@
     owner: zookeeper
     group: zookeeper  
   when: download.changed
-  notify: restart zookeeper
+  #notify: restart zookeeper
 
 - name: Zookeeper | Configure zookeeper cluster
   ansible.builtin.template:
@@ -62,7 +62,7 @@
     owner: zookeeper
     group: zookeeper
   when: download.changed
-  notify: restart zookeeper
+  #notify: restart zookeeper
 
 - name: Zookeeper | Configure id
   ansible.builtin.copy:
@@ -71,12 +71,12 @@
     owner: zookeeper
     group: zookeeper
   when: download.changed
-  notify: restart zookeeper
+  #notify: restart zookeeper
 
 - name: Zookeeper | Start zookeeper service
   ansible.builtin.systemd:
     name: zookeeper
-    state: started
+    state: restarted
     enabled: true
     daemon_reload: true
   when: download.changed

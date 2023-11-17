@@ -1,5 +1,5 @@
 [Unit]
-Description=Kafka
+Description=Kafka Service
 After=network.target
 
 [Service]
@@ -23,4 +23,4 @@ LimitNOFILE=500000
 
 [Install]
 WantedBy=multi-user.target
-Alias=kafka.service
+#Alias=kafka.service

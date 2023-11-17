@@ -37,7 +37,7 @@ locals {
   backend_count  = "2"
   nginx_count    = "0"
   os_count       = "1"
-  kafka_count    = "1"
+  kafka_count    = "3"
   /*
   disk = {
     "web" = {

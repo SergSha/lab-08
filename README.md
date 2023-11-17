@@ -211,3 +211,43 @@ os-servers-info = {
 имитирующий продажу новых и подержанных автомобилей:
 
 <img src="pics/screen-002.png" alt="screen-002.png" />
+
+
+
+
+[root@kafka-01 ~]# ss -tulpn
+Netid  State   Recv-Q  Send-Q          Local Address:Port    Peer Address:Port  Process                                                                         
+udp    UNCONN  0       0                     0.0.0.0:111          0.0.0.0:*      users:(("rpcbind",pid=631,fd=5),("systemd",pid=1,fd=76))                       
+udp    UNCONN  0       0                   127.0.0.1:323          0.0.0.0:*      users:(("chronyd",pid=6201,fd=5))                                              
+udp    UNCONN  0       0                        [::]:111             [::]:*      users:(("rpcbind",pid=631,fd=7),("systemd",pid=1,fd=78))                       
+udp    UNCONN  0       0                       [::1]:323             [::]:*      users:(("chronyd",pid=6201,fd=6))                                              
+tcp    LISTEN  0       128                   0.0.0.0:111          0.0.0.0:*      users:(("rpcbind",pid=631,fd=4),("systemd",pid=1,fd=75))                       
+tcp    LISTEN  0       128                   0.0.0.0:22           0.0.0.0:*      users:(("sshd",pid=925,fd=3))                                                  
+tcp    LISTEN  0       50                          *:37405  kafka       *:*      users:(("java",pid=18488,fd=123))                                              
+tcp    LISTEN  0       50                          *:39489  zookeeper   *:*      users:(("java",pid=17102,fd=50))                                               
+tcp    LISTEN  0       50                          *:9092  kafka        *:*      users:(("java",pid=18488,fd=151))                                              
+tcp    LISTEN  0       50                          *:2181  zookeeper    *:*      users:(("java",pid=17102,fd=54))                                               
+tcp    LISTEN  0       128                      [::]:111             [::]:*      users:(("rpcbind",pid=631,fd=6),("systemd",pid=1,fd=77))                       
+tcp    LISTEN  0       50       [::ffff:10.10.10.37]:3888  zookeeper    *:*      users:(("java",pid=17102,         fd=61))                                               
+tcp    LISTEN  0       50                          *:8080  zookeeper    *:*      users:(("java",pid=17102,fd=57))                                               
+tcp    LISTEN  0       128                      [::]:22              [::]:*      users:(("sshd",pid=925,fd=4))                                                  
+[root@kafka-01 ~]# 
+
+
+
+
+[root@os-01 ~]# ss -tulpn
+Netid  State   Recv-Q  Send-Q          Local Address:Port    Peer Address:Port  Process                                                                         
+udp    UNCONN  0       0                     0.0.0.0:111          0.0.0.0:*      users:(("rpcbind",pid=645,fd=5),("systemd",pid=1,fd=79))                       
+udp    UNCONN  0       0                   127.0.0.1:323          0.0.0.0:*      users:(("chronyd",pid=6219,fd=5))                                              
+udp    UNCONN  0       0                        [::]:111             [::]:*      users:(("rpcbind",pid=645,fd=7),("systemd",pid=1,fd=81))                       
+udp    UNCONN  0       0                       [::1]:323             [::]:*      users:(("chronyd",pid=6219,fd=6))                                              
+tcp    LISTEN  0       128                   0.0.0.0:111          0.0.0.0:*      users:(("rpcbind",pid=645,fd=4),("systemd",pid=1,fd=63))                       
+tcp    LISTEN  0       128                   0.0.0.0:22           0.0.0.0:*      users:(("sshd",pid=937,fd=3))                                                  
+tcp    LISTEN  0       50         [::ffff:127.0.0.1]:9600               *:*      users:(("java",pid=22090,fd=74))                                               
+tcp    LISTEN  0       128                      [::]:111             [::]:*      users:(("rpcbind",pid=645,fd=6),("systemd",pid=1,fd=80))                       
+tcp    LISTEN  0       2048     [::ffff:10.10.10.22]:9200               *:*      users:(("java",pid=12685,fd=597))                                              
+tcp    LISTEN  0       2048     [::ffff:10.10.10.22]:9300               *:*      users:(("java",pid=12685,fd=595))                                              
+tcp    LISTEN  0       128                      [::]:22              [::]:*      users:(("sshd",pid=937,fd=4))                                                  
+[root@os-01 ~]# 
+

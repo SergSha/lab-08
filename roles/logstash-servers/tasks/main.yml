@@ -1,0 +1,6 @@
+---
+#- name: Include nftables service
+#  include_tasks: nftables.yml
+
+- name: Install Logstash
+  include_tasks: logstash.yml

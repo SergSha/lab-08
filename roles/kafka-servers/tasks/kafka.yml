@@ -64,7 +64,7 @@
 - name: Kafka | Started kafka
   ansible.builtin.systemd:
     name: kafka
-    state: started
+    state: restarted
     enabled: true
     daemon_reload: true
   when: download.changed
@@ -82,7 +82,7 @@
   ansible.builtin.shell:
     cmd: |
       /opt/kafka/bin/kafka-topics.sh --create --topic {{ item }} --replication-factor 2 --partitions 2 --bootstrap-server ' 
-      {%- for item in groups['kafka_servers''] %}
+      {%- for item in groups['kafka_servers'] %}
       {{ hostvars[item].ansible_host }}:9092{% if not loop.last %},{% endif %}
       {%- endfor %}'
   ignore_errors: true

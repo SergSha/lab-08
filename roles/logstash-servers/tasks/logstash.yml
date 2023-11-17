@@ -1,13 +1,13 @@
 ---
 # wget https://artifacts.opensearch.org/logstash/logstash-oss-with-opensearch-output-plugin-8.9.0-linux-x64.tar.gz -O /tmp/logstash.tar.gz 
-- name: Logstash Install | Download Logstash {{ os_version }}
+- name: Logstash | Download Logstash {{ os_version }}
   ansible.builtin.get_url:
     url: https://artifacts.opensearch.org/logstash/logstash-oss-with-opensearch-output-plugin-8.9.0-linux-x64.tar.gz
     dest: /tmp/logstash.tar.gz
   register: download
 
 # useradd -M -s /bin/false logstash
-- name: Logstash Install | Create Logstash user
+- name: Logstash | Create Logstash user
   ansible.builtin.user:
     name: logstash
     state: present
@@ -16,7 +16,7 @@
   when: download.changed
 
 # mkdir /opt/logstash /var/log/logstash
-- name: Logstash Install | Create required directories
+- name: Logstash | Create required directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -28,9 +28,9 @@
     - /var/log/logstash
 
 # tar -xvzf logstash.tar.gz -C /opt/logstash --strip-components=1
-#- name: Logstash Install | Extract the tar file
+#- name: Logstash | Extract the tar file
 #  ansible.builtin.command: chdir=/tmp/ tar -xvzf logstash.tar.gz -C /opt/logstash --strip-components=1
-- name: Logstash Install | Download and extract the tar file
+- name: Logstash | Extract the tar file
   ansible.builtin.unarchive:
     src: /tmp/logstash.tar.gz
     dest: /opt/logstash
@@ -42,7 +42,7 @@
   when: download.changed
 
 # mkdir /opt/logstash/config/conf.d
-- name: Logstash Install | Create additional config directory
+- name: Logstash | Create additional config directory
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -53,7 +53,7 @@
     - /opt/logstash/config/conf.d
 
 # cp logstash.yml pipelines.yml /opt/logstash/config/logstash.yml
-- name: Logstash Install | Copy configuration files
+- name: Logstash | Copy configuration files
   ansible.builtin.template:
     src: "{{ item.source }}"
     dest: "{{ item.destination }}"
@@ -61,16 +61,16 @@
     group: logstash
     mode: 0600
   loop: 
-    - { source: 'logstash.yml', destination: '/opt/logstash/config/logstash.yml' }
-    - { source: 'pipelines.yml', destination: '/opt/logstash/config/pipelines.yml' }
+    - { source: 'logstash.yml.j2', destination: '/opt/logstash/config/logstash.yml' }
+    - { source: 'pipelines.yml.j2', destination: '/opt/logstash/config/pipelines.yml' }
     - { source: 'logstash.conf.j2', destination: '/opt/logstash/config/conf.d/logstash.conf' }
 
 # cp logstash.service /etc/systemd/system/logstash.service && \
 # chown -R root:root /etc/systemd/system/logstash.service && \
 # chmod 644 /etc/systemd/system/logstash.service
-- name: Logstash Install | Create systemd service
+- name: Logstash | Create systemd service
   ansible.builtin.template:
-    src: logstash.service
+    src: logstash.service.j2
     dest: /etc/systemd/system/logstash.service
     owner: root
     group: root
@@ -78,7 +78,7 @@
 
 # systemctl daemon-reload && \
 # systemctl enable --now logstash.service
-- name: Logstash Install | Start logstash
+- name: Logstash | Start logstash
   ansible.builtin.service:
     name: logstash
     state: restarted
