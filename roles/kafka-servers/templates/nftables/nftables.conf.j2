@@ -4,17 +4,21 @@ flush ruleset
 
 table ip filter {
 
+        chain ZOOKEEPER_INP {
+                tcp dport { 2181,2888,3888 } ct state new counter accept
+        }
         chain KAFKA_INP {
                 tcp dport 9092 ct state new counter accept
         }
         chain INPUT {
-                type filter hook input priority filter; policy drop;
+                type filter hook input priority filter; policy accept;
                 ct state invalid counter drop
                 iifname "lo" counter accept
                 tcp dport 22 ct state new counter accept
                 udp dport 323 counter accept
                 ip saddr {{ subnet_cidrs }} icmp type echo-request counter accept
                 ct state established,related counter accept
+                counter jump ZOOKEEPER_INP
                 counter jump KAFKA_INP
         }
 

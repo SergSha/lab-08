@@ -82,7 +82,7 @@ Outputs:
 backend-servers-info = {
   "backend-01" = {
     "ip_address" = tolist([
-      "10.10.10.5",
+      "10.10.10.34",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -90,7 +90,7 @@ backend-servers-info = {
   }
   "backend-02" = {
     "ip_address" = tolist([
-      "10.10.10.13",
+      "10.10.10.30",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -100,7 +100,7 @@ backend-servers-info = {
 db-servers-info = {
   "db-01" = {
     "ip_address" = tolist([
-      "10.10.10.12",
+      "10.10.10.8",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -110,7 +110,7 @@ db-servers-info = {
 iscsi-servers-info = {
   "iscsi-01" = {
     "ip_address" = tolist([
-      "10.10.10.40",
+      "10.10.10.31",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -120,10 +120,36 @@ iscsi-servers-info = {
 jump-servers-info = {
   "jump-01" = {
     "ip_address" = tolist([
-      "10.10.10.8",
+      "10.10.10.27",
     ])
     "nat_ip_address" = tolist([
-      "51.250.22.210",
+      "158.160.5.59",
+    ])
+  }
+}
+kafka-servers-info = {
+  "kafka-01" = {
+    "ip_address" = tolist([
+      "10.10.10.37",
+    ])
+    "nat_ip_address" = tolist([
+      "",
+    ])
+  }
+  "kafka-02" = {
+    "ip_address" = tolist([
+      "10.10.10.25",
+    ])
+    "nat_ip_address" = tolist([
+      "",
+    ])
+  }
+  "kafka-03" = {
+    "ip_address" = tolist([
+      "10.10.10.15",
+    ])
+    "nat_ip_address" = tolist([
+      "",
     ])
   }
 }
@@ -131,7 +157,7 @@ loadbalancer-info = toset([
   {
     "external_address_spec" = toset([
       {
-        "address" = "158.160.130.50"
+        "address" = "158.160.129.167"
         "ip_version" = "ipv4"
       },
     ])
@@ -145,7 +171,7 @@ loadbalancer-info = toset([
 nginx-servers-info = {
   "nginx-01" = {
     "ip_address" = tolist([
-      "10.10.10.31",
+      "10.10.10.26",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -153,7 +179,7 @@ nginx-servers-info = {
   }
   "nginx-02" = {
     "ip_address" = tolist([
-      "10.10.10.6",
+      "10.10.10.13",
     ])
     "nat_ip_address" = tolist([
       "",
@@ -163,23 +189,7 @@ nginx-servers-info = {
 os-servers-info = {
   "os-01" = {
     "ip_address" = tolist([
-      "10.10.10.17",
-    ])
-    "nat_ip_address" = tolist([
-      "",
-    ])
-  }
-  "os-02" = {
-    "ip_address" = tolist([
-      "10.10.10.11",
-    ])
-    "nat_ip_address" = tolist([
-      "",
-    ])
-  }
-  "os-03" = {
-    "ip_address" = tolist([
-      "10.10.10.24",
+      "10.10.10.6",
     ])
     "nat_ip_address" = tolist([
       "",

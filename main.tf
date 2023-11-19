@@ -35,7 +35,7 @@ locals {
   db_count       = "1"
   iscsi_count    = "1"
   backend_count  = "2"
-  nginx_count    = "0"
+  nginx_count    = "2"
   os_count       = "1"
   kafka_count    = "3"
   /*
@@ -222,7 +222,7 @@ module "backend-servers" {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
       subnet_id = subnet.id
-      nat       = true
+      #nat       = true
     }
     if subnet.name == "lab-subnet" #|| subnet.name == "backend-subnet"
   }
@@ -373,9 +373,9 @@ resource "yandex_compute_disk" "disks" {
 #  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  depends_on = [yandex_compute_disk.disks]
 #}
-/*
-resource "yandex_lb_target_group" "keepalived_group" {
-  name      = "keepalived-group"
+
+resource "yandex_lb_target_group" "webservers" {
+  name      = "webservers-group"
   region_id = "ru-central1"
   #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 
@@ -388,37 +388,69 @@ resource "yandex_lb_target_group" "keepalived_group" {
   }
 }
 
-resource "yandex_lb_network_load_balancer" "keepalived" {
-  name = "network-load-balancer"
+resource "yandex_lb_target_group" "dashboards" {
+  name      = "dashboards-group"
+  region_id = "ru-central1"
+  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+
+  dynamic "target" {
+    for_each = data.yandex_compute_instance.jump-servers[*].network_interface.0.ip_address
+    content {
+      subnet_id = yandex_vpc_subnet.subnets["lab-subnet"].id
+      address   = target.value
+    }
+  }
+}
+
+resource "yandex_lb_network_load_balancer" "mylb" {
+  name = "mylb"
   #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 
   listener {
-    name = "http-listener"
+    name = "webservers-listener"
     port = 80
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+  listener {
+    name = "dashboards-listener"
+    port = 5601
     external_address_spec {
       ip_version = "ipv4"
     }
   }
   
   attached_target_group {
-    target_group_id = yandex_lb_target_group.keepalived_group.id
+    target_group_id = yandex_lb_target_group.webservers.id
 
     healthcheck {
-      name = "http"
-      http_options {
+      name = "tcp"
+      tcp_options {
         port = 80
-        path = "/ping"
+      }
+    }
+  }
+  
+  attached_target_group {
+    target_group_id = yandex_lb_target_group.dashboards.id
+
+    healthcheck {
+      name = "tcp"
+      tcp_options {
+        port = 5601
       }
     }
   }
 }
 
-data "yandex_lb_network_load_balancer" "keepalived" {
-  name = "network-load-balancer"
+data "yandex_lb_network_load_balancer" "mylb" {
+  name = "mylb"
   #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
-  depends_on = [yandex_lb_network_load_balancer.keepalived]
+  depends_on = [yandex_lb_network_load_balancer.mylb]
 }
-*/
+
 /*
 resource "null_resource" "nginx-servers" {
 
