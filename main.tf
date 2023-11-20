@@ -46,13 +46,13 @@ locals {
   }
   */
 }
-/*
+
 resource "yandex_resourcemanager_folder" "folders" {
   for_each = local.folders
   name     = each.key
   cloud_id = local.cloud_id
 }
-*/
+
 #data "yandex_resourcemanager_folder" "folders" {
 #  for_each   = yandex_resourcemanager_folder.folders
 #  name       = each.value["name"]
@@ -60,18 +60,18 @@ resource "yandex_resourcemanager_folder" "folders" {
 #}
 
 resource "yandex_vpc_network" "vpc" {
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   name      = local.vpc_name
 }
 
 data "yandex_vpc_network" "vpc" {
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   name      = yandex_vpc_network.vpc.name
 }
 
 #resource "yandex_vpc_subnet" "subnet" {
 #  count          = length(local.subnet_cidrs)
-#  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+#  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  v4_cidr_blocks = local.subnet_cidrs
 #  zone           = local.zone
 #  name           = "${local.subnet_name}${format("%1d", count.index + 1)}"
@@ -81,7 +81,7 @@ data "yandex_vpc_network" "vpc" {
 resource "yandex_vpc_subnet" "subnets" {
   for_each = local.subnets
   name           = each.key
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   v4_cidr_blocks = each.value["v4_cidr_blocks"]
   zone           = local.zone
   network_id     = data.yandex_vpc_network.vpc.id
@@ -91,19 +91,19 @@ resource "yandex_vpc_subnet" "subnets" {
 #data "yandex_vpc_subnet" "subnets" {
 #  for_each   = yandex_vpc_subnet.subnets
 #  name       = each.value["name"]
-#  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+#  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  depends_on = [yandex_vpc_subnet.subnets]
 #}
 
 resource "yandex_vpc_gateway" "nat_gateway" {
   name = "test-gateway"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   shared_egress_gateway {}
 }
 
 resource "yandex_vpc_route_table" "rt" {
   name       = "test-route-table"
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_id = yandex_vpc_network.vpc.id
 
   static_route {
@@ -119,7 +119,7 @@ module "jump-servers" {
   count          = local.jump_count
   vm_name        = "jump-${format("%02d", count.index + 1)}"
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -140,7 +140,7 @@ module "jump-servers" {
 data "yandex_compute_instance" "jump-servers" {
   count      = length(module.jump-servers)
   name       = module.jump-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.jump-servers]
 }
 
@@ -149,7 +149,7 @@ module "db-servers" {
   count          = local.db_count
   vm_name        = "db-${format("%02d", count.index + 1)}"
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -170,7 +170,7 @@ module "db-servers" {
 data "yandex_compute_instance" "db-servers" {
   count      = length(module.db-servers)
   name       = module.db-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.db-servers]
 }
 
@@ -179,7 +179,7 @@ module "iscsi-servers" {
   count          = local.iscsi_count
   vm_name        = "iscsi-${format("%02d", count.index + 1)}"
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -208,7 +208,7 @@ module "iscsi-servers" {
 data "yandex_compute_instance" "iscsi-servers" {
   count      = length(module.iscsi-servers)
   name       = module.iscsi-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.iscsi-servers]
 }
 
@@ -217,7 +217,7 @@ module "backend-servers" {
   count          = local.backend_count
   vm_name        = "backend-${format("%02d", count.index + 1)}"
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -238,7 +238,7 @@ module "backend-servers" {
 data "yandex_compute_instance" "backend-servers" {
   count      = length(module.backend-servers)
   name       = module.backend-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.backend-servers]
 }
 
@@ -247,7 +247,7 @@ module "nginx-servers" {
   count          = local.nginx_count
   vm_name        = "nginx-${format("%02d", count.index + 1)}"
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -268,7 +268,7 @@ module "nginx-servers" {
 data "yandex_compute_instance" "nginx-servers" {
   count      = length(module.nginx-servers)
   name       = module.nginx-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.nginx-servers]
 }
 
@@ -279,7 +279,7 @@ module "os-servers" {
   cpu            = 2
   memory         = 8
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -300,7 +300,7 @@ module "os-servers" {
 data "yandex_compute_instance" "os-servers" {
   count      = length(module.os-servers)
   name       = module.os-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.os-servers]
 }
 
@@ -311,7 +311,7 @@ module "kafka-servers" {
   cpu            = 2
   memory         = 2
   vpc_name       = local.vpc_name
-  #folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id      = yandex_resourcemanager_folder.folders["lab-folder"].id
   network_interface = {
     for subnet in yandex_vpc_subnet.subnets :
     subnet.name => {
@@ -332,7 +332,7 @@ module "kafka-servers" {
 data "yandex_compute_instance" "kafka-servers" {
   count      = length(module.kafka-servers)
   name       = module.kafka-servers[count.index].vm_name
-  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [module.kafka-servers]
 }
 
@@ -354,7 +354,7 @@ resource "local_file" "inventory_file" {
 #resource "yandex_compute_disk" "disks" {
 #  for_each  = local.disks
 #  name      = each.key
-#  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+#  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  size      = each.value["size"]
 #  zone      = local.zone
 #}
@@ -362,7 +362,7 @@ resource "local_file" "inventory_file" {
 resource "yandex_compute_disk" "disks" {
   count     = local.iscsi_count
   name      = "web-${format("%02d", count.index + 1)}"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   size      = "1"
   zone      = local.zone
 }
@@ -370,14 +370,14 @@ resource "yandex_compute_disk" "disks" {
 #data "yandex_compute_disk" "disks" {
 #  for_each   = yandex_compute_disk.disks
 #  name       = each.value["name"]
-#  #folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
+#  folder_id  = yandex_resourcemanager_folder.folders["lab-folder"].id
 #  depends_on = [yandex_compute_disk.disks]
 #}
 
 resource "yandex_lb_target_group" "webservers" {
   name      = "webservers-group"
   region_id = "ru-central1"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 
   dynamic "target" {
     for_each = data.yandex_compute_instance.nginx-servers[*].network_interface.0.ip_address
@@ -391,7 +391,7 @@ resource "yandex_lb_target_group" "webservers" {
 resource "yandex_lb_target_group" "dashboards" {
   name      = "dashboards-group"
   region_id = "ru-central1"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 
   dynamic "target" {
     for_each = data.yandex_compute_instance.jump-servers[*].network_interface.0.ip_address
@@ -404,7 +404,7 @@ resource "yandex_lb_target_group" "dashboards" {
 
 resource "yandex_lb_network_load_balancer" "mylb" {
   name = "mylb"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
 
   listener {
     name = "webservers-listener"
@@ -447,7 +447,7 @@ resource "yandex_lb_network_load_balancer" "mylb" {
 
 data "yandex_lb_network_load_balancer" "mylb" {
   name = "mylb"
-  #folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
+  folder_id = yandex_resourcemanager_folder.folders["lab-folder"].id
   depends_on = [yandex_lb_network_load_balancer.mylb]
 }
 
